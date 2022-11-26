@@ -3,6 +3,7 @@ use gtk::glib::set_program_name;
 use gtk::{prelude::*, Application};
 
 mod cli;
+mod events;
 mod ui;
 
 fn main() {

@@ -9,10 +9,12 @@ use gtk::gdk::DragAction;
 use gtk::glib::{self, clone, Bytes, MainContext, Type, PRIORITY_DEFAULT};
 use gtk::{
     gdk::ContentProvider, prelude::*, Application, ApplicationWindow, Button, DragSource,
-    DropTarget, EventControllerKey, ListBox, PolicyType, ScrolledWindow,
+    DropTarget, ListBox, PolicyType, ScrolledWindow,
 };
 use gtk::{CenterBox, Image, Orientation};
 use url::Url;
+
+use crate::events;
 
 pub fn build_ui(app: &Application) {
     let args = Cli::parse();
@@ -20,6 +22,7 @@ pub fn build_ui(app: &Application) {
 
     // Create a scrollable list
     let list_box = ListBox::new();
+
     let scrolled_window = ScrolledWindow::builder()
         .hscrollbar_policy(PolicyType::Never) //  Disable horizontal scrolling
         .min_content_width(args.content_width)
@@ -41,14 +44,7 @@ pub fn build_ui(app: &Application) {
         build_source_ui(list_box, args);
     }
 
-    // Kill the app when Escape is pressed
-    let event_controller = EventControllerKey::new();
-    event_controller.connect_key_pressed(|_, key, _, _| {
-        if key.name().unwrap() == "Escape" {
-            std::process::exit(0)
-        }
-        return gtk::glib::signal::Inhibit(false);
-    });
+    let event_controller = events::exit_on_escape_key_pressed();
 
     window.add_controller(&event_controller);
     window.show();
@@ -63,7 +59,6 @@ fn check_if_files_exists(paths: &Vec<PathBuf>) {
         );
     }
 }
-
 
 fn build_source_ui(list_box: ListBox, args: Cli) {
     // Populate the list with the buttons, if there are any
