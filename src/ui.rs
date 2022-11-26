@@ -31,7 +31,7 @@ pub fn build_ui(app: &Application) {
 
     // Build the main window
     let window = ApplicationWindow::builder()
-        .title("ri pdrag")
+        .title("ripdrag")
         .resizable(args.resizable)
         .application(app)
         .child(&scrolled_window)
