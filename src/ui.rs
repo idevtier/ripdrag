@@ -15,15 +15,9 @@ use gtk::{CenterBox, Image, Orientation};
 use url::Url;
 
 pub fn build_ui(app: &Application) {
-    // Parse arguments and check if files exist
     let args = Cli::parse();
-    for path in &args.paths {
-        assert!(
-            path.exists(),
-            "{0} : no such file or directory",
-            path.display()
-        );
-    }
+    check_if_files_exists(&args.paths);
+
     // Create a scrollable list
     let list_box = ListBox::new();
     let scrolled_window = ScrolledWindow::builder()
@@ -59,6 +53,17 @@ pub fn build_ui(app: &Application) {
     window.add_controller(&event_controller);
     window.show();
 }
+
+fn check_if_files_exists(paths: &Vec<PathBuf>) {
+    for path in paths {
+        assert!(
+            path.exists(),
+            "{0} : no such file or directory",
+            path.display()
+        );
+    }
+}
+
 
 fn build_source_ui(list_box: ListBox, args: Cli) {
     // Populate the list with the buttons, if there are any
