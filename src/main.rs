@@ -3,7 +3,6 @@ use std::thread;
 use std::io::{self, BufRead};
 use std::path::PathBuf;
 
-use clap::Parser;
 use url::Url;
 
 use gtk::{prelude::*, Application, ApplicationWindow, Button, Orientation, CenterBox, ListBox, DragSource, DropTarget, EventControllerKey, Image, ScrolledWindow, PolicyType};
@@ -11,69 +10,9 @@ use gtk::glib::{self,clone, Continue, MainContext, PRIORITY_DEFAULT, Bytes, Type
 use gtk::gdk::{ContentProvider, DragAction};
 use gtk::gio::ApplicationFlags;
 
-#[derive(Parser)]
-#[command(about, version)]
-struct Cli {
-    /// Be verbose
-    #[arg(short, long)]
-    verbose: bool,
+mod cli;
 
-    /// Act as a target instead of source
-    #[arg(short, long)]
-    target: bool,
-
-    /// With --target, keep files to drag out
-    #[arg(short, long, requires = "target")]
-    keep: bool,
-
-    /// With --target, keep files to drag out
-    #[arg(short, long, requires = "target")]
-    print_path: bool,
-
-    /// Make the window resizable
-    #[arg(short, long)]
-    resizable: bool,
-    
-    /// Exit after first successful drag or drop 
-    #[arg(short = 'x', long)]
-    and_exit: bool,
-
-    /// Only display icons, no labels
-    #[arg(short, long)]
-    icons_only: bool,
-
-    /// Don't load thumbnails from images
-    #[arg(short, long)]
-    disable_thumbnails: bool,
-
-    /// Size of icons and thumbnails
-    #[arg(short = 's', long, value_name = "SIZE", default_value_t = 32)]
-    icon_size: i32,
-
-    /// Min width of the main window
-    #[arg(short = 'W', long, value_name = "WIDTH", default_value_t = 360)]
-    content_width: i32,
-
-    /// Default height of the main window
-    #[arg(short = 'H', long, value_name = "HEIGHT", default_value_t = 360)]
-    content_height: i32,
-
-    /// Accept paths from stdin
-    #[arg(short = 'I', long)]
-    from_stdin: bool,
-
-    /// Drag all the items together
-    #[arg(short = 'a', long)]
-    all: bool,
-
-    /// Show only the number of items and drag them together
-    #[arg(short = 'A', long)]
-    all_compact: bool,
-
-    /// Paths to the files you want to drag
-    #[arg(value_name = "PATH")]
-    paths: Vec<PathBuf>,
-}
+use cli::Cli;
 
 fn main() {
     set_program_name(Some("ripdrag"));
@@ -87,7 +26,7 @@ fn main() {
 
 fn build_ui(app: &Application) {
     // Parse arguments and check if files exist
-    let args =Cli::parse();
+    let args = Cli::parse();
     for path in &args.paths {
         assert!(path.exists(),"{0} : no such file or directory",path.display());
     }
